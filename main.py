@@ -5,10 +5,13 @@ from tracker import Tracker
 
 
 video_path = "./people.mp4"
+video_out_path = "./people_out.mp4"
+
 
 cap = cv2.VideoCapture(video_path)
-
 ret, frame = cap.read()
+
+cap_out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*"mp4v"), cap.get(cv2.CAP_PROP_FPS), (frame.shape[1], frame.shape[0]))
 
 model = YOLO("yolov8n.pt")
 
@@ -17,7 +20,6 @@ tracker = Tracker()
 while ret:
 
     results = model(frame)
-
     for result in results:
         detections = []
         for r in result.boxes.data.tolist():
@@ -45,9 +47,11 @@ while ret:
     cv2.imshow("Frame", frame)
     cv2.waitKey(25)
 
+    cap_out.write(frame)
     ret, frame = cap.read()
 
 
 cap.release()
+cap_out.release()
 cv2.destroyAllWindows()
 
